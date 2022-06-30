@@ -46,8 +46,9 @@ def viewFile(filepath):
     plt.plot(xValues, yValues, "r.")
     plt.show()
 
-generateWaves(200, sineWave, "data/sine", "sine_{}.csv")
-generateWaves(200, squareWave, "data/square", "square_{}.csv")
-generateWaves(200, triangleWave, "data/triangle", "tri_{}.csv")
-viewFile("data/triangle/tri_0.csv")
+if __name__ == "__main__":
+    generateWaves(200, sineWave, "data/sine", "sine_{}.csv")
+    generateWaves(200, squareWave, "data/square", "square_{}.csv")
+    generateWaves(200, triangleWave, "data/triangle", "tri_{}.csv")
+    viewFile("data/triangle/tri_0.csv")
 
