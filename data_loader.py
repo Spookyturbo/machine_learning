@@ -1,6 +1,7 @@
 from csv import list_dialects
 import pandas as pd
 import tensorflow as tf
+import numpy as np
 import os
 
 #At this point basically just a shortcut for some pandas splicing
@@ -37,7 +38,17 @@ class DataFileLoader:
         
         relevantData = self.df[groups]
         dataset = tf.data.Dataset.from_tensor_slices(relevantData)
-        dataset = dataset.map(lambda v: (v, self.fname))
+        dataset = dataset.map(lambda v: (v, int(self.label)))
+
+        return dataset
+    
+    def getFileData(self, groups = None):
+        if groups == None:
+            groups = self.colNames
+        
+        relevantData = self.df[groups]
+        dataset = tf.data.Dataset.from_tensor_slices([np.array(relevantData)])
+        dataset = dataset.map(lambda v: (v, int(self.label)))
 
         return dataset
         
@@ -75,7 +86,18 @@ class DataLoader:
             finalSet = finalSet.concatenate(datasets[i])
         
         return finalSet
+    
+    def getSeperateFileData(self, groups = None):
+        datasets = []
 
+        for dataFile in self.dataFiles:
+            datasets.append(dataFile.getFileData(groups))
+        
+        finalSet = datasets[0]
+        for i in range(1, len(datasets)):
+            finalSet = finalSet.concatenate(datasets[i])
+
+        return finalSet
 
 files = {
         "Walking" : { "value": 0, "files": [] },
@@ -112,27 +134,14 @@ def checkForBadValues(loader):
 
 if __name__ == "__main__":
 
-    files = {
-        "Walking" : { "value": 0, "files": [] },
-        "Running" : { "value": 1, "files": [] },
-        "Crawling" : { "value": 2, "files": [] },
-        "StairsUp" : { "value": 3, "files": [] },
-        "StairsDown" : { "value": 4, "files": [] }
-    }
+    loader = DataFileLoader("data/sine/sine_0.csv", label=0)
 
-    speeds = ["Average", "Fast", "Slow"]
-    
-    
-    for action in files.keys():
-        for speed in speeds:
-            folderPath = os.path.join("DataResults", f"{action}Results", speed)
-            filenames = [f for f in os.listdir(folderPath) if os.path.isfile(os.path.join(folderPath, f))]
-            filenames = [os.path.join(folderPath, f) for f in filenames]
-            files[action]["files"] = filenames
-    
-    loader = DataLoader(files)
+    ds = loader.getFileData()
 
-    checkForBadValues(loader)
+    for d, l in ds.take(1):
+        print(d, l)
+
+    
 
 
 
