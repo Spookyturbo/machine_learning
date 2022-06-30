@@ -22,12 +22,15 @@ def sineWave(x, amplitude, frequency, phase):
 def addNoise(wave, d = 0.1):
     wave += np.random.uniform(-d, d, size=NUM_SAMPLES)
 
-def generateWaves(num, generator, foldername, filenameFormat, noise = 0.1, ampRange = (-3.0, 3.0), freqRange = (0.5, 2.5), phaseRange = (-1.0, 1.0)):
+def generateWaves(num, generator, foldername, filenameFormat, noise = 0.1, ampRange = (-3.0, 3.0), freqRange = (0.5, 2.5), phaseRange = (-1.0, 1.0), random_x = True):
     if not os.path.exists(foldername):
         os.makedirs(foldername)
 
     for i in range(num):
-        xValues = np.random.uniform(0, 1, size=NUM_SAMPLES)
+        if random_x:
+            xValues = np.random.uniform(0, 1, size=NUM_SAMPLES)
+        else:
+            xValues = np.linspace(0, 1, num=NUM_SAMPLES)
         xValues.sort()
         amp, freq, phase = random.uniform(*ampRange), random.uniform(*freqRange), random.uniform(*phaseRange)
         yValues = generator(xValues, amp, freq, phase)
@@ -47,8 +50,9 @@ def viewFile(filepath):
     plt.show()
 
 if __name__ == "__main__":
-    generateWaves(200, sineWave, "data/sine", "sine_{}.csv")
-    generateWaves(200, squareWave, "data/square", "square_{}.csv")
-    generateWaves(200, triangleWave, "data/triangle", "tri_{}.csv")
+    #generateWaves(200, sineWave, "data/sine", "sine_{}.csv")
+    #generateWaves(200, squareWave, "data/square", "square_{}.csv")
+    #generateWaves(200, triangleWave, "data/triangle", "tri_{}.csv")
+    generateWaves(1, sineWave, "data/triangle", "tri_{}.csv", random_x=False)
     viewFile("data/triangle/tri_0.csv")
 
